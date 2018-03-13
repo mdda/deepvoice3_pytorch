@@ -6,12 +6,12 @@ from random import random
 
 n_vocab = len(symbols)
 
-_arphabet = nltk.corpus.cmudict.dict()
+_alphabet = nltk.corpus.cmudict.dict()
 
 
-def _maybe_get_arpabet(word, p):
+def _maybe_get_alphabet(word, p):
     try:
-        phonemes = _arphabet[word][0]
+        phonemes = _alphabet[word][0]
         phonemes = " ".join(phonemes)
     except KeyError:
         return word
@@ -20,7 +20,7 @@ def _maybe_get_arpabet(word, p):
 
 
 def mix_pronunciation(text, p):
-    text = ' '.join(_maybe_get_arpabet(word, p) for word in text.split(' '))
+    text = ' '.join(_maybe_get_alphabet(word, p) for word in text.split(' '))
     return text
 
 

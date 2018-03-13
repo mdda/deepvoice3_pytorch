@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Override hyper parameters
     hparams.parse(args["--hparams"])
     assert hparams.name == "deepvoice3"
-    print(hparams_debug_string())
+    #print(hparams.hparams_debug_string())
 
     assert name in ["jsut", "ljspeech", "vctk", "nikl_m", "nikl_s"]
     mod = importlib.import_module(name)
