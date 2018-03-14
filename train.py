@@ -867,7 +867,7 @@ def restore_parts(path, model):
         model_dict.update(valid_state_dict)
         model.load_state_dict(model_dict)
     except RuntimeError as e:
-        # there should be invalid size of weight(s), so load them per parameter
+        # there must have been an invalid size of weight(s), so load them per-parameter
         print(str(e))
         model_dict = model.state_dict()
         for k, v in valid_state_dict.items():
@@ -984,7 +984,8 @@ if __name__ == "__main__":
                 str(datetime.now()).replace(" ", "_").replace(":", "_")
         else:
             log_event_path = "log/run-test" + str(datetime.now()).replace(" ", "_")
-    print("Los event path: {}".format(log_event_path))
+    print("Loss event path: {}".format(log_event_path))
+
     writer = SummaryWriter(log_dir=log_event_path)
 
     # Train!
@@ -996,7 +997,7 @@ if __name__ == "__main__":
               nepochs=hparams.nepochs,
               clip_thresh=hparams.clip_thresh,
               train_seq2seq=train_seq2seq, train_postnet=train_postnet)
-     except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print("Interrupted!")
         pass
     finally:

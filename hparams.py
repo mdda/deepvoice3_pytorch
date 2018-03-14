@@ -46,7 +46,7 @@ hparams = tf.contrib.training.HParams(
     rescaling=False,
     rescaling_max=0.999,
     # mel-spectrogram is normalized to [0, 1] for each utterance and clipping may
-    # happen depends on min_level_db and ref_level_db, causing clipping noise.
+    # happen depending on min_level_db and ref_level_db, causing clipping noise.
     # If False, assertion is added to ensure no clipping happens.
     allow_clipping_in_normalization=True,
 
@@ -56,7 +56,7 @@ hparams = tf.contrib.training.HParams(
     embedding_weight_std=0.1,
     speaker_embedding_weight_std=0.01,
     padding_idx=0,
-    # Maximum number of input text length
+    # Maximum number of characters of input text length
     # try setting larger value if you want to give very long text input
     max_positions=512,
     dropout=1 - 0.95,
@@ -117,7 +117,7 @@ hparams = tf.contrib.training.HParams(
     force_monotonic_attention=True,
     # Attention constraint for incremental decoding
     window_ahead=3,
-    # 0 tends to prevent word repretetion, but sometime causes skip words
+    # 0 tends to prevent word repetition, but sometimes causes skip words
     window_backward=1,
     power=1.4,  # Power to raise magnitudes to prior to phase retrieval
 
