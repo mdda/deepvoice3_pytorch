@@ -837,9 +837,20 @@ def restore_parts(path, model):
     state = torch.load(path)["state_dict"]
     model_dict = model.state_dict()
     valid_state_dict = {k: v for k, v in state.items() if k in model_dict}
-    model_dict.update(valid_state_dict)
-    model.load_state_dict(model_dict)
-
+    try:
+        model_dict.update(valid_state_dict)
+        model.load_state_dict(model_dict)
+    except RuntimeError as e:
+        # there must have been an invalid size of weight(s), so load them per-parameter
+        print(str(e))
+        model_dict = model.state_dict()
+        for k, v in valid_state_dict.items():
+            model_dict[k] = v
+            try:
+                model.load_state_dict(model_dict)
+            except RuntimeError as e:
+                print(str(e))
+                warn("{}: may contain invalid size of weight. skipping...".format(k))
 
 if __name__ == "__main__":
     args = docopt(__doc__)
@@ -936,7 +947,7 @@ if __name__ == "__main__":
     # Setup summary writer for tensorboard
     if log_event_path is None:
         log_event_path = "log/run-test" + str(datetime.now()).replace(" ", "_")
-    print("Los event path: {}".format(log_event_path))
+    print("Loss event path: {}".format(log_event_path))
     writer = SummaryWriter(log_dir=log_event_path)
 
     # Train!
@@ -948,7 +959,7 @@ if __name__ == "__main__":
               nepochs=hparams.nepochs,
               clip_thresh=hparams.clip_thresh,
               train_seq2seq=train_seq2seq, train_postnet=train_postnet)
-     except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print("Interrupted!")
         pass
     finally:
