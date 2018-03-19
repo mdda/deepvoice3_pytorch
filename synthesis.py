@@ -138,14 +138,17 @@ if __name__ == "__main__":
     with open(text_list_file_path, "rb") as f:
         lines = f.readlines()
         for idx, line in enumerate(lines):
-            text = line.decode("utf-8")[:-1]
+            #text = line.decode("utf-8")[:-1]
+            text = line.decode("utf-8").strip()
+            if text.startswith('#') or len(text)==0:
+              continue # Skip empty lines and ones that are commented out with '#'
             words = nltk.word_tokenize(text)
             waveform, alignment, _, _ = tts(
                 model, text, p=replace_pronunciation_prob, speaker_id=speaker_id, fast=True)
-            dst_wav_path = join(dst_dir, "{}_{}{}.wav".format(
+            dst_wav_path = join(dst_dir, "{:02d}_{}{}.wav".format(
                 idx, checkpoint_name, file_name_suffix))
             dst_alignment_path = join(
-                dst_dir, "{}_{}{}_alignment.png".format(idx, checkpoint_name,
+                dst_dir, "{:02d}_{}{}_alignment.png".format(idx, checkpoint_name,
                                                         file_name_suffix))
             plot_alignment(alignment.T, dst_alignment_path,
                            info="{}, {}".format(hparams.builder, basename(checkpoint_path)))
