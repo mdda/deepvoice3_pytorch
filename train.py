@@ -22,11 +22,20 @@ options:
 from docopt import docopt
 
 import sys
-import gc
-import platform
-from os.path import dirname, join
+
+import os
+from os.path import dirname, join, expanduser
+
 from tqdm import tqdm, trange
 from datetime import datetime
+
+import numpy as np
+from numba import jit
+
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from matplotlib import cm
 
 # The deepvoice3 model
 from deepvoice3_pytorch import frontend, builder
@@ -41,20 +50,15 @@ from torch import optim
 import torch.backends.cudnn as cudnn
 from torch.utils import data as data_utils
 from torch.utils.data.sampler import Sampler
-import numpy as np
-from numba import jit
 
 from nnmnkwii.datasets import FileSourceDataset, FileDataSource
-from os.path import join, expanduser
 import random
 
 import librosa.display
-from matplotlib import pyplot as plt
-import sys
-import os
+
 from tensorboardX import SummaryWriter
-from matplotlib import cm
 from warnings import warn
+
 from hparams import hparams, hparams_debug_string
 
 fs = hparams.sample_rate
@@ -616,8 +620,8 @@ def train(model, data_loader, optimizer, writer,
             max_seq_len = max(input_lengths.max(), decoder_lengths.max())
             if max_seq_len >= hparams.max_positions:
                 raise RuntimeError(
-                    """max_seq_len ({}) >= max_posision ({})
-Input text or decoder targget length exceeded the maximum length.
+                    """max_seq_len ({}) >= max_position ({})
+Input text or decoder target length exceeded the maximum length.
 Please set a larger value for ``max_position`` in hyper parameters.""".format(
                         max_seq_len, hparams.max_positions))
 
@@ -992,7 +996,10 @@ if __name__ == "__main__":
               nepochs=hparams.nepochs,
               clip_thresh=hparams.clip_thresh,
               train_seq2seq=train_seq2seq, train_postnet=train_postnet)
-    except KeyboardInterrupt:
+     except KeyboardInterrupt:
+        print("Interrupted!")
+        pass
+    finally:
         save_checkpoint(
             model, optimizer, global_step, checkpoint_dir, global_epoch,
             train_seq2seq, train_postnet)

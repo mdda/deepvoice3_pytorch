@@ -57,12 +57,16 @@ def _process_utterance(out_dir, index, wav_path, text):
     if hparams.rescaling:
         wav = wav / np.abs(wav).max() * hparams.rescaling_max
 
-    # Compute the linear-scale spectrogram from the wav:
-    spectrogram = audio.spectrogram(wav).astype(np.float32)
-    n_frames = spectrogram.shape[1]
+    try:
+      # Compute the linear-scale spectrogram from the wav:
+      spectrogram = audio.spectrogram(wav).astype(np.float32)
+      n_frames = spectrogram.shape[1]
 
-    # Compute a mel-scale spectrogram from the wav:
-    mel_spectrogram = audio.melspectrogram(wav).astype(np.float32)
+      # Compute a mel-scale spectrogram from the wav:
+      mel_spectrogram = audio.melspectrogram(wav).astype(np.float32)
+    except Exception as e:
+      print("Problem with :", wav_path)
+      print(e)
 
     # Write the spectrograms to disk:
     spectrogram_filename = 'ljspeech-spec-%05d.npy' % index
