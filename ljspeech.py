@@ -73,6 +73,12 @@ def _process_utterance(out_dir, index, wav_path, text):
     mel_filename = 'ljspeech-mel-%05d.npy' % index
     np.save(os.path.join(out_dir, spectrogram_filename), spectrogram.T, allow_pickle=False)
     np.save(os.path.join(out_dir, mel_filename), mel_spectrogram.T, allow_pickle=False)
+  
+    # mdda added START : 
+    wav_filename = mel_filename.replace('-mel-', '-audio-')
+    wav_samples = hparams.fft_size + (n_frames-1)*hparams.hop_size
+    np.save(os.path.join(out_dir, wav_filename), wav[:wav_samples].astype(np.float32), allow_pickle=False)
+    # mdda added END
 
     # Return a tuple describing this training example:
     return (spectrogram_filename, mel_filename, n_frames, text)
