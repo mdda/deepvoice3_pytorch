@@ -878,7 +878,6 @@ def restore_parts(path, model):
                 print(str(e))
                 warn("{}: may contain invalid size of weight. skipping...".format(k))
 
-
 if __name__ == "__main__":
     args = docopt(__doc__)
     print("Command line args:\n", args)
