@@ -35,6 +35,13 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
     return [future.result() for future in tqdm(futures)]
 
 
+# mdda added START : 
+def spectrogram_raw(y):
+    D = audio._lws_processor().stft(y).T
+    S = audio._amp_to_db(np.abs(D)) - hparams.ref_level_db
+    return S.astype(np.float32)
+# mdda added END
+
 def _process_utterance(out_dir, index, wav_path, text):
     '''Preprocesses a single utterance audio/text pair.
 
@@ -76,8 +83,10 @@ def _process_utterance(out_dir, index, wav_path, text):
   
     # mdda added START : 
     wav_filename = mel_filename.replace('-mel-', '-audio-')
-    wav_samples = hparams.fft_size + (n_frames-1)*hparams.hop_size
-    np.save(os.path.join(out_dir, wav_filename), wav[:wav_samples].astype(np.float32), allow_pickle=False)
+    #wav_samples = hparams.fft_size + (n_frames-1)*hparams.hop_size  # No : 3 extra frames added : Don't bother chomping
+    np.save(os.path.join(out_dir, wav_filename), wav.astype(np.float32), allow_pickle=False)
+    spectrogramraw_filename = 'ljspeech-specraw-%05d.npy' % index
+    np.save(os.path.join(out_dir, spectrogramraw_filename), spectrogram_raw(wav).T, allow_pickle=False)
     # mdda added END
 
     # Return a tuple describing this training example:
