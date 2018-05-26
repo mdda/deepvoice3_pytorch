@@ -7,7 +7,7 @@ import os
 import subprocess
 from os.path import exists
 
-version = '0.0.5'
+version = '0.0.6'
 
 # Adapted from https://github.com/pytorch/pytorch
 cwd = os.path.dirname(os.path.abspath(__file__))
@@ -79,22 +79,21 @@ setup(name='deepvoice3_pytorch',
       install_requires=[
           "numpy",
           "scipy",
-          "torch >= 0.3.0",
+          "torch >= 0.4.0",
           "unidecode",
           "inflect",
           "librosa",
           "numba",
-          "lws <= 1.0",
+          "lws",
           "nltk",
-          "requests",
-          "PyQt5",
       ],
       extras_require={
-          "train": [
+          "bin": [
               "docopt",
               "tqdm",
               "tensorboardX",
               "nnmnkwii >= 0.0.11",
+              "requests",
           ],
           "test": [
               "nose",

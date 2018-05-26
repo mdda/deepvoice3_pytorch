@@ -4,6 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/deepvoice3_pytorch.svg)](https://pypi.python.org/pypi/deepvoice3_pytorch)
 [![Build Status](https://travis-ci.org/r9y9/deepvoice3_pytorch.svg?branch=master)](https://travis-ci.org/r9y9/deepvoice3_pytorch)
+[![Build status](https://ci.appveyor.com/api/projects/status/8eurjakfaofbr24k?svg=true)](https://ci.appveyor.com/project/r9y9/deepvoice3-pytorch)
 
 PyTorch implementation of convolutional networks-based text-to-speech synthesis models:
 
@@ -14,9 +15,10 @@ Audio samples are available at https://r9y9.github.io/deepvoice3_pytorch/.
 
 ## Online TTS demo
 
-A notebook supposed to be executed on https://colab.research.google.com is available:
+Notebooks supposed to be executed on https://colab.research.google.com are available:
 
 - [DeepVoice3: Multi-speaker text-to-speech demo](https://colab.research.google.com/github/r9y9/Colaboratory/blob/master/DeepVoice3_multi_speaker_TTS_en_demo.ipynb)
+- [DeepVoice3: Single-speaker text-to-speech demo](https://colab.research.google.com/github/r9y9/Colaboratory/blob/master/DeepVoice3_single_speaker_TTS_en_demo.ipynb)
 
 ## Highlights
 
@@ -24,7 +26,7 @@ A notebook supposed to be executed on https://colab.research.google.com is avail
 - Multi-speaker and single speaker versions of DeepVoice3
 - Audio samples and pre-trained models
 - Preprocessor for [LJSpeech (en)](https://keithito.com/LJ-Speech-Dataset/), [JSUT (jp)](https://sites.google.com/site/shinnosuketakamichi/publication/jsut) and [VCTK](http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html) datasets, as well as [carpedm20/multi-speaker-tacotron-tensorflow](https://github.com/carpedm20/multi-Speaker-tacotron-tensorflow) compatible custom dataset (in JSON format)
-- Language-dependent frontend text processor for English and Japanese 
+- Language-dependent frontend text processor for English and Japanese
 
 ### Samples
 
@@ -41,11 +43,29 @@ A notebook supposed to be executed on https://colab.research.google.com is avail
 
  | URL | Model      | Data     | Hyper paramters                                  | Git commit | Steps  |
  |-----|------------|----------|--------------------------------------------------|----------------------|--------|
- | [link](https://www.dropbox.com/s/cs6d070ommy2lmh/20171213_deepvoice3_checkpoint_step000210000.pth?dl=0) | DeepVoice3 | LJSpeech | `builder=deepvoice3,preset=deepvoice3_ljspeech` | [4357976](https://github.com/r9y9/deepvoice3_pytorch/tree/43579764f35de6b8bac2b18b52a06e4e11b705b2)| 210k ~ |
+ | [link](https://www.dropbox.com/s/5ucl9remrwy5oeg/20180505_deepvoice3_checkpoint_step000640000.pth?dl=0) | DeepVoice3 | LJSpeech | [link](https://www.dropbox.com/s/0ck82unm0bo0rxd/20180505_deepvoice3_ljspeech.json?dl=0) | [abf0a21](https://github.com/r9y9/deepvoice3_pytorch/tree/abf0a21f83aeb451b918f867bc23378f1e2e608b)| 640k |
  |  [link](https://www.dropbox.com/s/1y8bt6bnggbzzlp/20171129_nyanko_checkpoint_step000585000.pth?dl=0)   | Nyanko     | LJSpeech | `builder=nyanko,preset=nyanko_ljspeech`     | [ba59dc7](https://github.com/r9y9/deepvoice3_pytorch/tree/ba59dc75374ca3189281f6028201c15066830116) | 585k |
   |  [link](https://www.dropbox.com/s/uzmtzgcedyu531k/20171222_deepvoice3_vctk108_checkpoint_step000300000.pth?dl=0)   | Multi-speaker DeepVoice3     | VCTK | `builder=deepvoice3_multispeaker,preset=deepvoice3_vctk`     | [0421749](https://github.com/r9y9/deepvoice3_pytorch/tree/0421749af908905d181f089f06956fddd0982d47) | 300k + 300k |
 
-See "Synthesize from a checkpoint" section in the README for how to generate speech samples. Please make sure that you are on the specific git commit noted above.
+To use pre-trained models, it's highly recommended that you are on the **specific git commit** noted above. i.e.,
+
+```
+git checkout ${commit_hash}
+```
+
+Then follow the "Synthesize from a checkpoint" section in the README of the specific git commit. Please notice that the latest development version of the repository may not work.
+
+You could try for example:
+
+```
+# pretrained model (20180505_deepvoice3_checkpoint_step000640000.pth)
+# hparams (20180505_deepvoice3_ljspeech.json)
+git checkout 4357976
+python synthesis.py --preset=20180505_deepvoice3_ljspeech.json \
+  20180505_deepvoice3_checkpoint_step000640000.pth \
+  sentences.txt \
+  output_dir
+```
 
 ## Notes on hyper parameters
 
@@ -61,6 +81,7 @@ See "Synthesize from a checkpoint" section in the README for how to generate spe
 
 - Python 3
 - CUDA >= 8.0
+- PyTorch >= v0.4.0
 - TensorFlow >= v1.3
 - [nnmnkwii](https://github.com/r9y9/nnmnkwii) >= v0.0.11
 - [MeCab](http://taku910.github.io/mecab/) (Japanese only)
@@ -71,7 +92,7 @@ Please install packages listed above first, and then
 
 ```
 git clone https://github.com/r9y9/deepvoice3_pytorch && cd deepvoice3_pytorch
-pip install -e ".[train]"
+pip install -e ".[bin]"
 ```
 
 ## Getting started
@@ -104,7 +125,7 @@ python train.py --preset=presets/deepvoice3_ljspeech.json --data-root=./data/ljs
 - LJSpeech (en): https://keithito.com/LJ-Speech-Dataset/
 - VCTK (en): http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html
 - JSUT (jp): https://sites.google.com/site/shinnosuketakamichi/publication/jsut
-- NIKL (ko) (**Need korean cellphone number to access it**): http://www.korean.go.kr/front/board/boardStandardView.do?board_id=4&mn_id=17&b_seq=464 
+- NIKL (ko) (**Need korean cellphone number to access it**): http://www.korean.go.kr/front/board/boardStandardView.do?board_id=4&mn_id=17&b_seq=464
 
 ### 1. Preprocessing
 
@@ -131,7 +152,7 @@ python preprocess.py --preset=presets/deepvoice3_ljspeech.json ljspeech ~/data/L
 When this is done, you will see extracted features (mel-spectrograms and linear spectrograms) in `./data/ljspeech`.
 
 #### 1-1. Building custom dataset. (using json_meta)
-Building your own dataset, with metadata in JSON format (compatible with [carpedm20/multi-speaker-tacotron-tensorflow](https://github.com/carpedm20/multi-Speaker-tacotron-tensorflow)) is currently supported.  
+Building your own dataset, with metadata in JSON format (compatible with [carpedm20/multi-speaker-tacotron-tensorflow](https://github.com/carpedm20/multi-Speaker-tacotron-tensorflow)) is currently supported.
 Usage:
 
 ```
@@ -147,14 +168,14 @@ python preprocess.py json_meta "./datasets/datasetA/alignment.json,./datasets/da
 
 #### 1-2. Preprocessing custom english datasets with long silence. (Based on [vctk_preprocess](vctk_preprocess/))
 
-Some dataset, especially automatically generated dataset may include long silence and undesirable leading/trailing noises, undermining the char-level seq2seq model. 
+Some dataset, especially automatically generated dataset may include long silence and undesirable leading/trailing noises, undermining the char-level seq2seq model.
 (e.g. VCTK, although this is covered in vctk_preprocess)
 
 To deal with the problem, `gentle_web_align.py` will
-- **Prepare phoneme alignments for all utterances** 
-- Cut silences during preprocessing 
+- **Prepare phoneme alignments for all utterances**
+- Cut silences during preprocessing
 
-`gentle_web_align.py` uses [Gentle](https://github.com/lowerquality/gentle), a kaldi based speech-text alignment tool. This accesses web-served Gentle application, aligns given sound segments with transcripts and converts the result to HTK-style label files, to be processed in `preprocess.py`. Gentle can be run in Linux/Mac/Windows(via Docker). 
+`gentle_web_align.py` uses [Gentle](https://github.com/lowerquality/gentle), a kaldi based speech-text alignment tool. This accesses web-served Gentle application, aligns given sound segments with transcripts and converts the result to HTK-style label files, to be processed in `preprocess.py`. Gentle can be run in Linux/Mac/Windows(via Docker).
 
 Preliminary results show that while HTK/festival/merlin-based method in `vctk_preprocess/prepare_vctk_labels.py` works better on VCTK, Gentle is more stable with audio clips with ambient noise. (e.g. movie excerpts)
 
@@ -182,7 +203,7 @@ python train.py --data-root=${data-root} --preset=<json> --hparams="parameters y
 Suppose you build a DeepVoice3-style model using LJSpeech dataset, then you can train your model by:
 
 ```
-python train.py --preset=presets/deepvoice3_ljspeech.json --data-root=./data/ljspeech/ 
+python train.py --preset=presets/deepvoice3_ljspeech.json --data-root=./data/ljspeech/
 ```
 
 Model checkpoints (.pth) and alignments (.png) are saved in `./checkpoints` directory per 10000 steps by default.
@@ -290,9 +311,22 @@ From my experience, it can get reasonable speech quality very quickly rather tha
 There are two important options used above:
 
 - `--restore-parts=<N>`: It specifies where to load model parameters. The differences from the option `--checkpoint=<N>` are 1) `--restore-parts=<N>` ignores all invalid parameters, while `--checkpoint=<N>` doesn't. 2) `--restore-parts=<N>` tell trainer to start from 0-step, while `--checkpoint=<N>` tell trainer to continue from last step. `--checkpoint=<N>` should be ok if you are using exactly same model and continue to train, but it would be useful if you want to customize your model architecture and take advantages of pre-trained model.
-- `--speaker-id=<N>`: It specifies what speaker of data is used for training. This should only be specified if you are using multi-speaker dataset. As for VCTK, speaker id is automatically assigned incrementally (0, 1, ..., 107) according to the `speaker_info.txt` in the dataset. 
+- `--speaker-id=<N>`: It specifies what speaker of data is used for training. This should only be specified if you are using multi-speaker dataset. As for VCTK, speaker id is automatically assigned incrementally (0, 1, ..., 107) according to the `speaker_info.txt` in the dataset.
 
-If you are training multi-speaker model, speaker adaptation will only work **when `n_speakers` is identical**. 
+If you are training multi-speaker model, speaker adaptation will only work **when `n_speakers` is identical**.
+
+## Trouble shooting
+
+### [#5](https://github.com/r9y9/deepvoice3_pytorch/issues/5) RuntimeError: main thread is not in main loop
+
+
+This may happen depending on backends you have for matplotlib. Try changing backend for matplotlib and see if it works as follows:
+
+```
+MPLBACKEND=Qt5Agg python train.py ${args...}
+```
+
+In [#78](https://github.com/r9y9/deepvoice3_pytorch/pull/78#issuecomment-385327057), engiecat reported that changing the backend of matplotlib from Tkinter(TkAgg) to PyQt5(Qt5Agg) fixed the problem.
 
 ## Acknowledgements
 
