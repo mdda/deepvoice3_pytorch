@@ -357,7 +357,9 @@ class Decoder(nn.Module):
         x = x.transpose(1, 2)
 
         # project to mel-spectorgram
-        outputs = F.sigmoid(x)
+        #outputs = F.sigmoid(x)
+        
+        outputs = x   # TEST : Don't normalise 
 
         # Done flag
         done = F.sigmoid(self.fc(x))
@@ -457,7 +459,10 @@ class Decoder(nn.Module):
             ave_alignment = ave_alignment.div_(num_attention_layers)
 
             # Ooutput & done flag predictions
-            output = F.sigmoid(x)
+            #output = F.sigmoid(x)
+            
+            output = x # Test : don't normalize
+            
             done = F.sigmoid(self.fc(x))
 
             decoder_states += [decoder_state]
