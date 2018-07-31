@@ -472,13 +472,15 @@ def save_states(global_step, writer, mel_outputs, linear_outputs, attn, mel, y,
     # Predicted mel spectrogram
     if mel_outputs is not None:
         mel_output = mel_outputs[idx].cpu().data.numpy()
-        mel_output = prepare_spec_image(audio._denormalize(mel_output))
+        #mel_output = prepare_spec_image(audio._denormalize(mel_output))
+        mel_output = prepare_spec_image(mel_output)
         writer.add_image("Predicted mel spectrogram", mel_output, global_step)
 
     # Predicted spectrogram
     if linear_outputs is not None:
         linear_output = linear_outputs[idx].cpu().data.numpy()
-        spectrogram = prepare_spec_image(audio._denormalize(linear_output))
+        #spectrogram = prepare_spec_image(audio._denormalize(linear_output))
+        spectrogram = prepare_spec_image(linear_output)
         writer.add_image("Predicted linear spectrogram", spectrogram, global_step)
 
         # Predicted audio signal
@@ -496,13 +498,15 @@ def save_states(global_step, writer, mel_outputs, linear_outputs, attn, mel, y,
     # Target mel spectrogram
     if mel_outputs is not None:
         mel_output = mel[idx].cpu().data.numpy()
-        mel_output = prepare_spec_image(audio._denormalize(mel_output))
+        #mel_output = prepare_spec_image(audio._denormalize(mel_output))
+        mel_output = prepare_spec_image(mel_output)
         writer.add_image("Target mel spectrogram", mel_output, global_step)
 
     # Target spectrogram
     if linear_outputs is not None:
         linear_output = y[idx].cpu().data.numpy()
-        spectrogram = prepare_spec_image(audio._denormalize(linear_output))
+        #spectrogram = prepare_spec_image(audio._denormalize(linear_output))
+        spectrogram = prepare_spec_image(linear_output)
         writer.add_image("Target linear spectrogram", spectrogram, global_step)
 
 
@@ -618,9 +622,9 @@ def train(device, model, data_loader, optimizer, writer,
             max_seq_len = max(input_lengths.max(), decoder_lengths.max())
             if max_seq_len >= hparams.max_positions:
                 raise RuntimeError(
-                    """max_seq_len ({}) >= max_position ({})
+                    """max_seq_len ({}) >= max_positions ({})
 Input text or decoder target length exceeded the maximum length.
-Please set a larger value for ``max_position`` in hyper parameters.""".format(
+Please set a larger value for ``max_positions`` in hyper parameters.""".format(
                         max_seq_len, hparams.max_positions))
 
             # Transform data to CUDA device
@@ -683,6 +687,7 @@ Please set a larger value for ``max_position`` in hyper parameters.""".format(
 
             # done:
             if train_seq2seq:
+                #print(torch.min(done_hat), torch.max(done_hat))
                 done_loss = binary_criterion(done_hat, done)
 
             # linear:

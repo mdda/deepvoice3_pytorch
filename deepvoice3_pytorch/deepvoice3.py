@@ -266,7 +266,8 @@ class Decoder(nn.Module):
         # Mel-spectrogram (before sigmoid) -> Done binary flag
         self.fc = Linear(in_dim * r, 1)
 
-        self.max_decoder_steps = 200
+        #self.max_decoder_steps = 200
+        self.max_decoder_steps = 200*4  # 75% overlap
         self.min_decoder_steps = 10
         self.use_memory_mask = use_memory_mask
         if isinstance(force_monotonic_attention, bool):
@@ -356,13 +357,13 @@ class Decoder(nn.Module):
         # Back to B x T x C
         x = x.transpose(1, 2)
 
-        # project to mel-spectorgram
+        # project to mel-spectrogram
         #outputs = F.sigmoid(x)
         
         outputs = x   # TEST : Don't normalise 
 
         # Done flag
-        done = F.sigmoid(self.fc(x))
+        done = torch.sigmoid( self.fc(x) )
 
         return outputs, torch.stack(alignments), done, decoder_states
 
@@ -606,4 +607,5 @@ class Converter(nn.Module):
         # Back to B x T x C
         x = x.transpose(1, 2)
 
-        return F.sigmoid(x)
+        #return F.sigmoid(x)
+        return x  # No post-normalisation (mdda: Test)
