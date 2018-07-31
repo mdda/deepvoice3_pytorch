@@ -8,7 +8,6 @@ n_vocab = len(symbols)
 
 _alphabet = nltk.corpus.cmudict.dict()
 
-
 def _maybe_get_alphabet(word, p):
     try:
         phonemes = _alphabet[word][0]
