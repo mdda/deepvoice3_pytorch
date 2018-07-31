@@ -37,6 +37,8 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib import cm
 
+import platform
+
 # The deepvoice3 model
 from deepvoice3_pytorch import frontend, builder
 import audio
