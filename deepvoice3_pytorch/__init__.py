@@ -80,7 +80,8 @@ class MultiSpeakerTTSModel(nn.Module):
 
         # Reshape
         # (B, T, mel_dim)
-        mel_outputs = mel_outputs.view(B, -1, self.mel_dim)
+        #mel_outputs = mel_outputs.view(B, -1, self.mel_dim)
+        mel_outputs = mel_outputs.contiguous().view(B, -1, self.mel_dim)  # mdda updated
 
         # Prepare postnet inputs
         if self.use_decoder_state_for_postnet_input:

@@ -306,13 +306,13 @@ class Decoder(nn.Module):
             w = self.key_position_rate
             # TODO: may be useful to have projection per attention layer
             if self.speaker_proj1 is not None:
-                w = w * F.sigmoid(self.speaker_proj1(speaker_embed)).view(-1)
+                w = w * torch.sigmoid(self.speaker_proj1(speaker_embed)).view(-1)
             text_pos_embed = self.embed_keys_positions(text_positions, w)
             keys = keys + text_pos_embed
         if frame_positions is not None:
             w = self.query_position_rate
             if self.speaker_proj2 is not None:
-                w = w * F.sigmoid(self.speaker_proj2(speaker_embed)).view(-1)
+                w = w * torch.sigmoid(self.speaker_proj2(speaker_embed)).view(-1)
             frame_pos_embed = self.embed_query_positions(frame_positions, w)
 
         # transpose only once to speed up attention layers
@@ -376,7 +376,7 @@ class Decoder(nn.Module):
         w = self.key_position_rate
         # TODO: may be useful to have projection per attention layer
         if self.speaker_proj1 is not None:
-            w = w * F.sigmoid(self.speaker_proj1(speaker_embed)).view(-1)
+            w = w * torch.sigmoid(self.speaker_proj1(speaker_embed)).view(-1)
         text_pos_embed = self.embed_keys_positions(text_positions, w)
         keys = keys + text_pos_embed
 
@@ -402,7 +402,7 @@ class Decoder(nn.Module):
             frame_pos = keys.data.new(B, 1).fill_(t + 1).long()
             w = self.query_position_rate
             if self.speaker_proj2 is not None:
-                w = w * F.sigmoid(self.speaker_proj2(speaker_embed)).view(-1)
+                w = w * torch.sigmoid(self.speaker_proj2(speaker_embed)).view(-1)
             frame_pos_embed = self.embed_query_positions(frame_pos, w)
 
             if test_inputs is not None:
@@ -464,7 +464,7 @@ class Decoder(nn.Module):
             
             output = x # Test : don't normalize
             
-            done = F.sigmoid(self.fc(x))
+            done = torch.sigmoid( self.fc(x) )
 
             decoder_states += [decoder_state]
             outputs += [output]
