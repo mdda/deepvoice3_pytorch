@@ -267,7 +267,7 @@ class Decoder(nn.Module):
         self.fc = Linear(in_dim * r, 1)
 
         #self.max_decoder_steps = 200
-        self.max_decoder_steps = 200*4  # 75% overlap
+        self.max_decoder_steps = 200*4  # 75% overlap ?
         self.min_decoder_steps = 10
         self.use_memory_mask = use_memory_mask
         if isinstance(force_monotonic_attention, bool):

@@ -413,8 +413,8 @@ def eval_model(global_step, writer, device, model, checkpoint_dir, ismultispeake
             signal /= np.max(np.abs(signal))
 
             # Alignment
-            path = join(eval_output_dir, "step{:09d}_text{}_{}_alignment.png".format(
-                global_step, idx, speaker_str))
+            path = join(eval_output_dir, "text{}_step{:09d}_{}_alignment.png".format(
+                idx, global_step, speaker_str))
             save_alignment(path, alignment)
             tag = "eval_averaged_alignment_{}_{}".format(idx, speaker_str)
             writer.add_image(tag, np.uint8(cm.viridis(np.flip(alignment, 1).T) * 255), global_step)
@@ -424,8 +424,8 @@ def eval_model(global_step, writer, device, model, checkpoint_dir, ismultispeake
                              prepare_spec_image(mel), global_step)
 
             # Audio
-            path = join(eval_output_dir, "step{:09d}_text{}_{}_predicted.wav".format(
-                global_step, idx, speaker_str))
+            path = join(eval_output_dir, "text{}_step{:09d}_{}_predicted.wav".format(
+                idx, global_step, speaker_str))
             audio.save_wav(signal, path)
 
             try:

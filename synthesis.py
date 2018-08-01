@@ -64,13 +64,14 @@ def tts(model, text, p=0, speaker_id=None, fast=False):
     linear_output = linear_outputs[0].cpu().data.numpy()
     spectrogram = audio._denormalize(linear_output)
     alignment = alignments[0].cpu().data.numpy()
-    mel01 = mel_outputs[0].cpu().data.numpy()
-    mel = audio._denormalize(mel01)
+    #mel01 = mel_outputs[0].cpu().data.numpy()
+    #mel = audio._denormalize(mel01)
+    mel = mel_outputs[0].cpu().data.numpy()
 
     # Predicted audio signal
     waveform = audio.inv_spectrogram(linear_output.T)
 
-    return waveform, alignment, spectrogram, mel, mel01
+    return waveform, alignment, spectrogram, mel
 
 
 def _load(checkpoint_path):
