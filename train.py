@@ -702,7 +702,8 @@ Please set a larger value for ``max_positions`` in hyper parameters.""".format(
             # Combine losses
             if train_seq2seq and train_postnet:
                 #loss = mel_loss + linear_loss + done_loss
-                loss = mel_loss + linear_loss + done_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
+                #loss = mel_loss + linear_loss + done_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
+                loss = mel_loss + linear_loss*0.25 + done_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
             elif train_seq2seq:
                 loss = mel_loss + done_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
             elif train_postnet:
@@ -716,7 +717,9 @@ Please set a larger value for ``max_positions`` in hyper parameters.""".format(
                 soft_mask = torch.from_numpy(soft_mask).to(device)
                 attn_loss = (attn * soft_mask).mean()
                 #loss += attn_loss
-                loss += attn_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
+                #loss += attn_loss*16.  # mdda : With unscaled mels (and linear), need to upscale other losses
+                #loss += attn_loss*64.  # mdda : With unscaled mels (and linear), need to upscale other losses
+                loss += attn_loss*100.  # mdda : With unscaled mels (and linear), need to upscale other losses
 
             if global_step > 0 and global_step % checkpoint_interval == 0:
                 save_states(

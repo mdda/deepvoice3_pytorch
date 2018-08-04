@@ -61,17 +61,20 @@ def tts(model, text, p=0, speaker_id=None, fast=False):
         mel_outputs, linear_outputs, alignments, done = model(
             sequence, text_positions=text_positions, speaker_ids=speaker_ids)
 
-    linear_output = linear_outputs[0].cpu().data.numpy()
-    spectrogram = audio._denormalize(linear_output)
     alignment = alignments[0].cpu().data.numpy()
-    #mel01 = mel_outputs[0].cpu().data.numpy()
-    #mel = audio._denormalize(mel01)
+    linear_output = linear_outputs[0].cpu().data.numpy()
     mel = mel_outputs[0].cpu().data.numpy()
+      
+    # From when it needed denormalisation
+    #mel = audio._denormalize(mel)
+
+    # Just for visualisation?
+    #spectrogram = audio._denormalize(linear_output)
 
     # Predicted audio signal
     waveform = audio.inv_spectrogram(linear_output.T)
 
-    return waveform, alignment, spectrogram, mel
+    return waveform, alignment, linear_output, mel
 
 
 def _load(checkpoint_path):
@@ -139,19 +142,22 @@ if __name__ == "__main__":
             if text.startswith('#') or len(text)==0:
               continue # Skip empty lines and ones that are commented out with '#'
             words = nltk.word_tokenize(text)
-            waveform, alignment, _, _, mel01 = tts(
+            waveform, alignment, spec, mel = tts(
                 model, text, p=replace_pronunciation_prob, speaker_id=speaker_id, fast=True)
-            dst_wav_path = join(dst_dir, "{:02d}_{}{}.wav".format(
-                idx, checkpoint_name, file_name_suffix))
-            dst_mel_path = join(dst_dir, "{:02d}_{}{}_mel.npy".format(
-                idx, checkpoint_name, file_name_suffix))
-            dst_alignment_path = join(
-                dst_dir, "{:02d}_{}{}_alignment.png".format(idx, checkpoint_name,
-                                                        file_name_suffix))
-            np.save(dst_mel_path, mel01.astype(np.float32), allow_pickle=False)
-            plot_alignment(alignment.T, dst_alignment_path,
+            dst_base_path = join(dst_dir, "{:02d}_{}{}".format(idx, checkpoint_name, file_name_suffix))
+            #dst_wav_path = join(dst_dir, "{:02d}_{}{}.wav".format(
+            #    idx, checkpoint_name, file_name_suffix))
+            #dst_mel_path = join(dst_dir, "{:02d}_{}{}_mel.npy".format(
+            #    idx, checkpoint_name, file_name_suffix))
+            #dst_alignment_path = join(
+            #    dst_dir, "{:02d}_{}{}_alignment.png".format(
+            #    idx, checkpoint_name, file_name_suffix))
+            #np.save(dst_mel_path, mel01.astype(np.float32), allow_pickle=False)
+            np.save(dst_base_path + '_spec.npy', spec.astype(np.float32), allow_pickle=False)
+            np.save(dst_base_path + '_mel.npy',  mel.astype(np.float32), allow_pickle=False)
+            plot_alignment(alignment.T, dst_base_path + '_alignment.png',
                            info="{}, {}".format(hparams.builder, basename(checkpoint_path)))
-            audio.save_wav(waveform, dst_wav_path)
+            audio.save_wav(waveform, dst_base_path + '.wav')
             name = splitext(basename(text_list_file_path))[0]
             if output_html:
                 print("""
@@ -166,8 +172,8 @@ Your browser does not support the audio element.
 
 <div align="center"><img src="/audio/{}/{}/{}" /></div>
                   """.format(text, len(text), len(words),
-                             hparams.builder, name, basename(dst_wav_path),
-                             hparams.builder, name, basename(dst_alignment_path)))
+                             hparams.builder, name, basename(dst_base_path+'.wav'),
+                             hparams.builder, name, basename(dst_base_path+'_alignment.png')))
             else:
                 print(idx, ": {}\n ({} chars, {} words)".format(text, len(text), len(words)))
 
