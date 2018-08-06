@@ -297,6 +297,25 @@ class MaskedL1Loss(nn.Module):
         loss = self.criterion(input * mask_, target * mask_)
         return loss / mask_.sum()
 
+class MaskedLoss(nn.Module):
+    def __init__(self, criterion):
+        super(MaskedLoss, self).__init__()
+        #self.criterion = nn.L1Loss(size_average=False)
+        self.criterion = criterion
+
+    def forward(self, input, target, lengths=None, mask=None, max_len=None):
+        if lengths is None and mask is None:
+            raise RuntimeError("Should provide either lengths or mask")
+
+        # (B, T, 1)
+        if mask is None:
+            mask = sequence_mask(lengths, max_len).unsqueeze(-1)
+
+        # (B, T, D)
+        mask_ = mask.expand_as(input)
+        loss = self.criterion(input * mask_, target * mask_)
+        return loss / mask_.sum()
+
 
 def collate_fn(batch):
     """Create batch"""
@@ -521,8 +540,12 @@ def masked_mean(y, mask):
 
 
 def spec_loss(y_hat, y, mask, priority_bin=None, priority_w=0):
-    masked_l1 = MaskedL1Loss()
+    #masked_l1 = MaskedL1Loss()
+    masked_l1 = MaskedLoss( nn.L1Loss(size_average=False) )
     l1 = nn.L1Loss()
+
+    masked_l2 = MaskedLoss( nn.MSELoss(size_average=False) )
+    l2 = nn.MSELoss()
 
     w = hparams.masked_loss_weight
 
@@ -530,9 +553,11 @@ def spec_loss(y_hat, y, mask, priority_bin=None, priority_w=0):
     if w > 0:
         assert mask is not None
         l1_loss = w * masked_l1(y_hat, y, mask=mask) + (1 - w) * l1(y_hat, y)
+        l2_loss = w * masked_l2(y_hat, y, mask=mask) + (1 - w) * l2(y_hat, y)
     else:
         assert mask is None
         l1_loss = l1(y_hat, y)
+        l2_loss = l2(y_hat, y)
 
     # Priority L1 loss
     if priority_bin is not None and priority_w > 0:
@@ -555,7 +580,11 @@ def spec_loss(y_hat, y, mask, priority_bin=None, priority_w=0):
         else:
             binary_div = z.mean()
 
-    return l1_loss, binary_div
+    if y_hat.size(-1)>100:
+      return l1_loss, binary_div  # This is for the linear_spec loss : Unchanged
+    else:
+      print(y_hat.size(), l1_loss, l2_loss)
+      return l1_loss*0.5 + l2_loss*0.5, binary_div
 
 
 @jit(nopython=True)
